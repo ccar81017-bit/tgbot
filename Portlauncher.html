@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft Cloud Sync Launcher</title>
+    <style>
+        :root {
+            --bg-dark: #0f1115;
+            --panel-bg: #161920;
+            --input-bg: #1f232d;
+            --text-main: #f1f2f6;
+            --text-muted: #747d8c;
+            --neon-blue: #00a8ff;
+            --neon-green: #4cd137;
+            --neon-orange: #fbc531;
+            --neon-purple: #9c27b0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .launcher-header {
+            width: 100%;
+            background-color: var(--panel-bg);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+            border-bottom: 2px solid #202430;
+        }
+
+        .brand-zone { display: flex; align-items: center; gap: 15px; }
+        .logo-cube { width: 35px; height: 35px; background: linear-gradient(135deg, #576574, #2f3640); border: 3px solid #718093; border-radius: 6px; }
+        .brand-title h1 { margin: 0; font-size: 20px; font-weight: 800; }
+        
+        .ip-config-zone {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background-color: var(--input-bg);
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid #2c3242;
+        }
+
+        .ip-config-zone label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; }
+        .ip-input { background: transparent; border: none; color: #fff; font-family: monospace; width: 120px; font-size: 13px; }
+        .ip-input:focus { outline: none; }
+
+        .main-layout {
+            display: flex;
+            width: 100%;
+            max-width: 1100px;
+            gap: 25px;
+            padding: 30px 20px;
+            box-sizing: border-box;
+        }
+
+        .grid-panel {
+            flex: 2;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+        }
+
+        .ui-card {
+            background-color: var(--panel-bg);
+            border-radius: 14px;
+            padding: 22px;
+            border: 1px solid #202430;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 220px;
+        }
+
+        .card-header-zone { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; }
+        .icon-box { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .ui-card h3 { margin: 0; font-size: 16px; font-weight: 700; }
+
+        .input-group { margin-bottom: 12px; }
+        .input-group label { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 5px; text-transform: uppercase; }
+        
+        .file-input-wrapper {
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        /* Красивый кастомный выбор файлов */
+        .file-input-hidden {
+            width: 100%;
+            padding: 10px;
+            background: var(--input-bg);
+            border: 1px dashed #4a5568;
+            border-radius: 8px;
+            color: var(--text-muted);
+            font-size: 12px;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+
+        .text-field {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--input-bg);
+            border: 1px solid #2c3242;
+            border-radius: 8px;
+            color: #fff;
+            box-sizing: border-box;
+            font-size: 13px;
+        }
+
+        .btn-action {
+            width: 100%;
+            padding: 11px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            color: #fff;
+            margin-top: auto;
+        }
+
+        .btn-blue { background-color: var(--neon-blue); }
+        .btn-green { background-color: var(--neon-green); color: #0f1115; }
+        .btn-orange { background-color: var(--neon-orange); color: #0f1115; }
+        .btn-purple { background-color: #a29bfe; color: #0f1115; }
+
+        .monitor-panel {
+            flex: 1;
+            background-color: var(--panel-bg);
+            border-radius: 14px;
+            border: 1px solid #202430;
+            display: flex;
+            flex-direction: column;
+            min-width: 300px;
+        }
+
+        .monitor-header { padding: 18px; border-bottom: 1px solid #202430; font-weight: 700; font-size: 14px; color: var(--text-muted); }
+        
+        .web-console {
+            padding: 15px;
+            background-color: #0b0c10;
+            margin: 15px;
+            border-radius: 10px;
+            flex-grow: 1;
+            font-family: 'Consolas', monospace;
+            font-size: 12px;
+            color: #00ff66;
+            min-height: 300px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="launcher-header">
+        <div class="brand-zone">
+            <div class="logo-cube"></div>
+            <div class="brand-title">
+                <h1>MC CLOUD TARGET</h1>
+            </div>
+        </div>
+        <!-- Поле настройки IP адреса твоего основного ПК прямо в шапке сайта -->
+        <div class="ip-config-zone">
+            <label>Target IP:</label>
+            <input type="text" id="launcher-ip" class="ip-input" value="localhost">
+        </div>
+    </header>
+
+    <main class="main-layout">
+        
+        <div class="grid-panel">
+            
+            <!-- Загрузка версий (файлов конфигурации .json) -->
+            <div class="ui-card">
+                <div>
+                    <div class="card-header-zone">
+                        <div class="icon-box" style="background-color: rgba(0,168,255,0.1); color: var(--neon-blue);">V</div>
+                        <h3>Залить Версию</h3>
+                    </div>
+                    <div class="input-group">
+                        <label>Выбрать файл версии (.json)</label>
+                        <input type="file" id="file-version" class="file-input-hidden">
+                    </div>
+                </div>
+                <button class="btn-action btn-blue" onclick="uploadFile('versions', 'file-version')">Отправить Ядро</button>
+            </div>
+
+            <!-- Загрузка Модов -->
+            <div class="ui-card">
+                <div>
+                    <div class="card-header-zone">
+                        <div class="icon-box" style="background-color: rgba(76,209,55,0.1); color: var(--neon-green);">M</div>
+                        <h3>Залить Мод</h3>
+                    </div>
+                    <div class="input-group">
+                        <label>Файл модификации (.jar)</label>
+                        <input type="file" id="file-mod" class="file-input-hidden">
+                    </div>
+                    <div class="input-group">
+                        <label>Привязать к версии игры (опционально)</label>
+                        <input type="text" id="mod-ver-tag" class="text-field" placeholder="Например: 1.21.1">
+                    </div>
+                </div>
+                <button class="btn-action btn-green" onclick="uploadFile('mods', 'file-mod', 'mod-ver-tag')">Загрузить в /mods</button>
+            </div>
+
+            <!-- Загрузка Ресурспаков -->
+            <div class="ui-card">
+                <div>
+                    <div class="card-header-zone">
+                        <div class="icon-box" style="background-color: rgba(251,197,49,0.1); color: var(--neon-orange);">R</div>
+                        <h3>Залить Ресурспак</h3>
+                    </div>
+                    <div class="input-group">
+                        <label>Архив текстур (.zip)</label>
+                        <input type="file" id="file-pack" class="file-input-hidden">
+                    </div>
+                </div>
+                <button class="btn-action btn-orange" onclick="uploadFile('resourcepacks', 'file-pack')">Загрузить пак</button>
+            </div>
+
+            <!-- Загрузка Шейдеров -->
+            <div class="ui-card">
+                <div>
+                    <div class="card-header-zone">
+                        <div class="icon-box" style="background-color: rgba(156,39,176,0.1); color: #a29bfe;">S</div>
+                        <h3>Залить Шейдер</h3>
+                    </div>
+                    <div class="input-group">
+                        <label>Архив шейдеров (.zip)</label>
+                        <input type="file" id="file-shader" class="file-input-hidden">
+                    </div>
+                </div>
+                <button class="btn-action btn-purple" onclick="uploadFile('shaderpacks', 'file-shader')">Загрузить шейдер</button>
+            </div>
+
+        </div>
+
+        <div class="monitor-panel">
+            <div class="monitor-header">СТАТУС ЗАГРУЗКИ ФАЙЛОВ</div>
+            <div class="web-console" id="log-output">Выберите файл и нажмите кнопку отправки...</div>
+        </div>
+
+    </main>
+
+    <script>
+        function uploadFile(fileType, inputId, verInputId = null) {
+            const consoleOut = document.getElementById("log-output");
+            const ip = document.getElementById("launcher-ip").value.strip || document.getElementById("launcher-ip").value;
+            const fileInput = document.getElementById(inputId);
+            
+            if (fileInput.files.length === 0) {
+                consoleOut.style.color = "#ff4757";
+                consoleOut.textContent = "[UI Error] Сначала выберите физический файл на диске через кнопку обзора!";
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const gameVersion = verInputId ? document.getElementById(verInputId).value : "";
+
+            consoleOut.style.color = "#fbc531";
+            consoleOut.textContent = `>> Подготовка потока данных...\n>> Файл: ${file.name}\n>> Размер: ${(file.size / 1024 / 1024).toFixed(2)} MB\n>> Отправка на ${ip}:8080...`;
+
+            // Читаем файл как бинарный массив (ArrayBuffer)
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const arrayBuffer = e.target.result;
+
+                // Отправляем бинарный файл методом POST
+                fetch(`http://${ip}:8080/upload`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/octet-stream',
+                        'File-Type': fileType,
+                        'File-Name': encodeURIComponent(file.name),
+                        'Game-Version': gameVersion
+                    },
+                    body: arrayBuffer
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if(data.status === "success") {
+                        consoleOut.style.color = "#00ff66";
+                        consoleOut.textContent = `[УСПЕХ] Файл доставлен по сети!\nСервер сохранил его по пути:\nD:\\Games\\launcher_root\\${fileType}\\${file.name}`;
+                    } else {
+                        consoleOut.style.color = "#ff4757";
+                        consoleOut.textContent = `[Ошибка Сервера] ${data.message}`;
+                    }
+                })
+                .catch(err => {
+                    consoleOut.style.color = "#ff4757";
+                    consoleOut.textContent = `[Сетевая Ошибка] Не удалось загрузить файл.\n\nУбедись, что:\n1. На основном ПК запущен новый скрипт Python.\n2. В шапке сайта введен правильный IP-адрес твоего ПК (вместо localhost, если ты сидишь с телефона или другого ноута).`;
+                });
+            };
+            
+            reader.readAsArrayBuffer(file);
+        }
+    </script>
+</body>
+</html>
